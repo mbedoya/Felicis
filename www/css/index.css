@@ -1,0 +1,14 @@
+.ui-filter-inset {
+    margin-top: 0;
+}
+
+#breadcrumb{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    height: 20px;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: cornflowerblue;
+    color: #fff;
+    width: 100%;
+}
