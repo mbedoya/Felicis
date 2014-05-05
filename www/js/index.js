@@ -5,8 +5,6 @@ $("li.item a").on("click", function(e){
 
 $( document ).on( "pageinit", "#pageregistration", function() {
 
-    console.log("init");
-
     $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
 
         console.log("filterablebeforefilter");
@@ -17,9 +15,9 @@ $( document ).on( "pageinit", "#pageregistration", function() {
             html = "";
         $ul.html( "" );
 
-        console.log($input.val());
-
         if ( value && value.length > 2 ) {
+
+            alert(value);
 
             $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
             $ul.listview( "refresh" );
