@@ -21,7 +21,13 @@ $( document ).on( "pageinit", "#pageregistration", function() {
                 url: "http://www.mocky.io/v2/5367ab02d6b7c4040bd1ce47",
                 dataType: "jsonp",
                 crossDomain: true,
-                data: {}
+                data: {},
+                success: function(){
+                    alert("ok");
+                },
+                error: function(){
+                    alert("error");
+                }
             })
             .then( function ( response ) {
 
