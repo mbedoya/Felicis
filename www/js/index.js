@@ -7,8 +7,6 @@ $( document ).on( "pageinit", "#pageregistration", function() {
 
     $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
 
-        console.log("filterablebeforefilter");
-
         var $ul = $( this ),
             $input = $( data.input ),
             value = $input.val(),
@@ -16,8 +14,6 @@ $( document ).on( "pageinit", "#pageregistration", function() {
         $ul.html( "" );
 
         if ( value && value.length > 2 ) {
-
-            alert(value);
 
             $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
             $ul.listview( "refresh" );
@@ -28,6 +24,9 @@ $( document ).on( "pageinit", "#pageregistration", function() {
                 data: {}
             })
             .then( function ( response ) {
+
+                    alert('resp');
+
                     $.each( response, function ( i, val ) {
                         html += "<li class='.item'><a href='#' >" + val.name + "</a></li>";
                     });
