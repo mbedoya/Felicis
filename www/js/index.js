@@ -1,7 +1,10 @@
 
-$("li.item a").on("click", function(e){
-    console.log("selected");
-});
+//Database Object
+var db = null;
+var myDbUpdates = null;
+var myDbRecipes = null;
+
+var connections = { webServer: "http://54.187.147.191" };
 
 $( document ).on( "pageinit", "#pageregistration", function() {
 
@@ -18,30 +21,156 @@ $( document ).on( "pageinit", "#pageregistration", function() {
             $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
             $ul.listview( "refresh" );
             $.ajax({
-                url: "http://www.mocky.io/v2/5367ab02d6b7c4040bd1ce47",
-                dataType: "jsonp",
-                crossDomain: true,
-                data: {},
-                success: function(){
-                    alert("ok");
+                url: connections.webServer + "/breed/search",
+                dataType: "json",
+                type: "POST",
+                data: { text: value },
+                success: function(data){
+
                 },
-                error: function(){
-                    alert("error");
+                error: function(a, b, c){
+                    alert("Error getting breeds, please check internet connection");
                 }
             })
             .then( function ( response ) {
-
-                    alert('resp');
-
                     $.each( response, function ( i, val ) {
                         html += "<li class='.item'><a href='#' >" + val.name + "</a></li>";
                     });
                     $ul.html( html );
                     $ul.listview( "refresh" );
                     $ul.trigger( "updatelayout");
+
+                    $( "#petbreed li a").on("click", function (){
+                        $input.val($(this).html());
+                        $ul.html( "" );
+                    });
             });
         }
     });
+});
+
+function showRecipes(){
+
+    var $ul = $( "#recipes" );
+    $ul.html( "" );
+    var html = "";
+
+    myDbRecipes.getAll(function(tx, rs){
+
+        for (var i=0; i<rs.rows.length; i++) {
+            var row = rs.rows.item(i);
+            html += "<li ><a href='#' >" + row['name'] + "</a></li>";
+        }
+
+        $ul.html( html );
+        $ul.listview( "refresh" );
+        $ul.trigger( "updatelayout");
+
+    });
+
+    console.log("recipes shown");
+}
+
+function applyUpdate(updateName){
+
+    $.mobile.loading( 'show', {
+        text: 'Getting recipes...',
+        textVisible: true,
+        theme: 'a',
+        html: ""
+    });
+
+    //Get Recipes
+    $.ajax({
+        url: connections.webServer + "/recipe/get",
+        dataType: "json",
+        type: "POST",
+        data: { },
+        success: function(data){
+
+        },
+        error: function(a, b, c){
+            $.mobile.loading('hide');
+            showRecipes();
+            alert("Error getting recipes, please check internet connection");
+        }
+    })
+        .then( function ( response ) {
+
+            $.mobile.loading('hide');
+
+            if (response.length){
+
+                //Delete old recipes
+                myDbRecipes.delete();
+                $.each( response, function ( i, val ) {
+                    myDbRecipes.insert(val.name, val.description);
+                    console.log("inserting recipe " + val.name);
+                });
+            }
+             //insert update record
+             myDbUpdates.insert(updateName, null);
+
+            showRecipes();
+        });
+
+}
+
+$( document ).on( "pageinit", "#pagewelcome", function() {
+
+
+    $.mobile.loading( 'show', {
+        text: 'Checking for updates...',
+        textVisible: true,
+        theme: 'a',
+        html: ""
+    });
+
+    db = new database_js();
+    db.initialize();
+    myDbUpdates = new db_updates_js(db);
+    myDbRecipes = new db_recipes_js(db);
+
+    var numberOfUpdates = 0;
+
+    //Check for local updates
+    myDbUpdates.getAll(function(tx, rs){
+
+        console.log("updates");
+
+        numberOfUpdates = rs.rows.length;
+
+        //Check for online updates
+        $.ajax({
+            url: connections.webServer + "/update/search",
+            dataType: "json",
+            type: "POST",
+            data: { updatesApplied: numberOfUpdates },
+            success: function(data){
+
+            },
+            error: function(a, b, c){
+                $.mobile.loading('hide');
+                showRecipes();
+                alert("Error getting updates, please check internet connection");
+            }
+        })
+            .then( function ( response ) {
+
+                $.mobile.loading('hide');
+
+                if (response.length){
+                    $.each( response, function ( i, val ) {
+                        applyUpdate();
+                    });
+                }else{
+                    showRecipes();
+                }
+
+            });
+
+    });
+
 });
 
 $(document).ready(function(){
