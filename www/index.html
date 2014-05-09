@@ -15,7 +15,60 @@
     <div data-role="page" id="pageregistration" data-theme="a" >
 
         <div id="header" data-role="header">
-           My Header
+            My Header
+        </div><!-- /header -->
+
+        <div data-role="content"  >
+
+            <div id="breadcrumb">Register</div>
+
+            <div class="register_form">
+
+                Personal Information
+
+                <div data-role="fieldcontain" class="ui-hide-label">
+
+                    <!-- your name -->
+                    <label for="personname" >your name</label>
+                    <input id="personname" name="personname" type="text" placeholder="your name" >
+
+                    <!-- your email -->
+                    <label for="email" >your email</label>
+                    <input id="email" name="email" type="text" placeholder="email" >
+
+                </div>
+
+                Pet Information
+
+                <div data-role="fieldcontain" class="ui-hide-label">
+
+                    <!-- pet name -->
+                    <label for="petname" >pet name</label>
+                    <input id="petname" name="petname" type="text" placeholder="pet name" >
+
+                    <!-- pet breed -->
+                    <label for="petbreed" >pet breed</label>
+                    <ul name="petbreed" id="petbreed" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="find a breed..." data-filter-theme="a"></ul>
+
+
+                </div>
+
+                <input id="registrationbutton" type="button" value="Save">
+
+            </div>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" >
+            My Footer
+        </div> <!-- /footer -->
+
+    </div><!-- /registration -->
+
+    <!-- PROFILE -->
+    <div data-role="page" id="pageprofile" data-theme="a" >
+
+        <div id="header" data-role="header">
+            My Header
         </div><!-- /header -->
 
         <div data-role="content"  >
@@ -94,7 +147,7 @@
 
                 </div>
 
-                <input id="registrationbutton" type="button" value="Save">
+                <input id="saveprofilebutton" type="button" value="Save">
 
             </div>
         </div><!-- /content -->
@@ -103,7 +156,7 @@
             My Footer
         </div> <!-- /footer -->
 
-    </div><!-- /registration -->
+    </div><!-- /profile -->
 
 
     <!-- WELCOME -->
@@ -116,6 +169,30 @@
         <div data-role="content"  >
 
             <div id="breadcrumb">Welcome</div>
+
+            <div id="hello">Hello <span id="username"></span></div>
+
+            <div id="education">
+                Did you know you can give your lovely dog just this? No dry or can food is necessary.
+                <img src="img/food.jpg" title="food" >
+            </div>
+
+            <input id="registrationid" type="text" >
+
+            Myths
+            <div >
+                <ul id="myths" data-role="listview" data-inset="true">
+                    <li>
+                        <a href="#">Dogs need balanced dry food</a>
+                    </li>
+                    <li>
+                        <a href="#">Homemade food can be dangerous</a>
+                    </li>
+                    <li>
+                        <a href="#">Dogs just need meat</a>
+                    </li>
+                </ul>
+            </div>
 
             Recipes
             <div >
@@ -139,8 +216,10 @@
     <script type="text/javascript" src="js/storage/database.js"></script>
     <script type="text/javascript" src="js/storage/db_updates.js"></script>
     <script type="text/javascript" src="js/storage/db_recipes.js"></script>
-    <script src="js/handlebars-v1.3.0.js"></script>        <
+    <script type="text/javascript" src="js/storage/db_profile.js"></script>
+    <script src="js/handlebars-v1.3.0.js"></script>
     <script type="text/javascript" src="phonegap.js"></script>
+    <script type="text/javascript" src="PushNotification.js"></script>
     <script type="text/javascript" src="js/mobiles/app.js"></script>
     <script type="text/javascript">
         var controller = new index_js();

@@ -83,6 +83,8 @@ var database_js = function(){
 
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS myupdate (id INTEGER PRIMARY KEY, name TEXT, date NUMERIC);', [], nullDataHandler, errorHandler);
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS recipe (id INTEGER PRIMARY KEY, name TEXT, description TEXT);', [], nullDataHandler, errorHandler);
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS profile (id INTEGER PRIMARY KEY, name TEXT, email TEXT, password TEXT);', [], nullDataHandler, errorHandler);
+
 
                 console.log("tables created");
 

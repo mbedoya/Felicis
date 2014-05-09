@@ -3,10 +3,44 @@
 var db = null;
 var myDbUpdates = null;
 var myDbRecipes = null;
+var myDbProfile = null;
 
-var connections = { webServer: "http://54.187.147.191" };
+//User
+var user = { name: "", email: "" };
+
+var connections = { webServer: "http://54.186.52.104" };
 
 $( document ).on( "pageinit", "#pageregistration", function() {
+
+    $.mobile.loading( 'show', {
+        text: 'Initializing...',
+        textVisible: true,
+        theme: 'a',
+        html: ""
+    });
+
+    db = new database_js();
+    db.initialize();
+    myDbUpdates = new db_updates_js(db);
+    myDbRecipes = new db_recipes_js(db);
+    myDbProfile = new db_profile_js(db);
+
+    //checking if profile exists
+    myDbProfile.getAll(function(tx, rs){
+
+        $.mobile.loading( 'hide' );
+
+        if (rs.rows.length){
+
+            user.name = rs.rows.item(0)['name'];
+            user.email = rs.rows.item(0)['email'];
+            $.mobile.changePage("#pagewelcome", {transition: "none"});
+        }
+
+    });
+});
+
+$( document ).on( "pageinit", "#pageprofile", function() {
 
     $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
 
@@ -118,6 +152,8 @@ function applyUpdate(updateName){
 
 $( document ).on( "pageinit", "#pagewelcome", function() {
 
+    //Show name of user
+    $("#hello #username").html(user.name);
 
     $.mobile.loading( 'show', {
         text: 'Checking for updates...',
@@ -125,11 +161,6 @@ $( document ).on( "pageinit", "#pagewelcome", function() {
         theme: 'a',
         html: ""
     });
-
-    db = new database_js();
-    db.initialize();
-    myDbUpdates = new db_updates_js(db);
-    myDbRecipes = new db_recipes_js(db);
 
     var numberOfUpdates = 0;
 
@@ -175,12 +206,6 @@ $( document ).on( "pageinit", "#pagewelcome", function() {
 
 $(document).ready(function(){
 
-    function welcome(){
-
-        $.mobile.changePage("#pagewelcome", {transition: "none"});
-        $.mobile.loading( 'hide' );
-    }
-
     $("#registrationbutton").on("click", function(){
 
         $.mobile.loading( 'show', {
@@ -190,7 +215,14 @@ $(document).ready(function(){
             html: ""
         });
 
-        setTimeout(welcome, 2000);
+        user.name = $("#pageregistration #personname").val();
+        user.email = $("#pageregistration #email").val();
+
+        myDbProfile.insert(user.name, user.email);
+
+        $.mobile.loading( 'hide' );
+
+        $.mobile.changePage("#pagewelcome", {transition: "none"});
 
     });
 
@@ -198,10 +230,39 @@ $(document).ready(function(){
 
 /* MOBILE INTERACTION */
 
+function onNotificationGCM(e) {
+    switch( e.event )
+    {
+        case 'registered':
+            if ( e.regid.length > 0 )
+            {
+                console.log("Regid " + e.regid);
+                alert('registration id = '+e.regid);
+
+                $("#registrationid").val(e.regid);
+            }
+            break;
+
+        case 'message':
+            // this is the actual push notification. its format depends on the data model from the push server
+            alert('message = '+e.message+' msgcnt = '+e.msgcnt);
+            break;
+
+        case 'error':
+            alert('GCM error = '+e.msg);
+            break;
+
+        default:
+            alert('An unknown GCM event has occurred');
+            break;
+    }
+}
+
 //It gets mobile events
 var index_js = function(){
 
     var aplicacion;
+    var pushNotification;
 
     this.start = function(){
 
@@ -217,7 +278,23 @@ var index_js = function(){
         //aplicacion.escucharEvento(aplicacion.EVENTO_BOTON_MENU, aplicacion.sender.onBotonMenuPresionado);
         //Evento Botón Atrás
         //aplicacion.escucharEvento(aplicacion.EVENTO_BOTON_ATRAS, aplicacion.sender.onBotonAtrasPresionado);
+
+
+        //GCM Project 500486635893
+        //App Server key AIzaSyAw5zkQI8plPyxOjeY-nw3UUODTQd9Nzv8
+        pushNotification = window.plugins.pushNotification;
+        pushNotification.register(aplicacion.sender.onNotificationSuccess, aplicacion.sender.onNotificationError,{"senderID":"500486635893","ecb":"onNotificationGCM"});
     }
+
+    this.onNotificationSuccess = function(result) {
+        alert('Callback Success! Result = '+result);
+    }
+
+    this.onNotificationError = function(error) {
+        alert('pusherror:' + error);
+    }
+
+
 
     //Método que se invoca cuando se presiona el botón Menú
     this.onBotonMenuPresionado = function (e) {

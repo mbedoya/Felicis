@@ -1,3 +1,7 @@
+body{
+    font-size: 18px;
+}
+
 .ui-filter-inset {
     margin-top: 0;
 }
@@ -10,5 +14,19 @@
     text-align: center;
     background-color: cornflowerblue;
     color: #fff;
+    width: 100%;
+}
+
+#hello {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#education{
+    font-size: 20px;
+    color: #b03911;
+}
+
+#education img{
     width: 100%;
 }
