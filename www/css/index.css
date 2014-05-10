@@ -30,3 +30,7 @@ body{
 #education img{
     width: 100%;
 }
+
+p#title{
+    font-weight: bold;
+}

@@ -8,9 +8,11 @@ var myDbProfile = null;
 //User
 var user = { name: "", email: "" };
 
-var connections = { webServer: "http://54.186.52.104" };
+var connections = { webServer: "http://54.187.2.0" };
 
-$( document ).on( "pageinit", "#pageregistration", function() {
+var updatesChecked = false;
+
+function initialize(){
 
     $.mobile.loading( 'show', {
         text: 'Initializing...',
@@ -21,169 +23,132 @@ $( document ).on( "pageinit", "#pageregistration", function() {
 
     db = new database_js();
     db.initialize();
-    myDbUpdates = new db_updates_js(db);
-    myDbRecipes = new db_recipes_js(db);
-    myDbProfile = new db_profile_js(db);
 
-    //checking if profile exists
-    myDbProfile.getAll(function(tx, rs){
+    if (db.dbSupport){
+
+        myDbUpdates = new db_updates_js(db);
+        myDbRecipes = new db_recipes_js(db);
+        myDbProfile = new db_profile_js(db);
+
+        //checking if profile exists
+        myDbProfile.getAll(function(tx, rs){
+
+            $.mobile.loading( 'hide' );
+
+            if (rs.rows.length){
+
+                user.name = rs.rows.item(0)['name'];
+                user.email = rs.rows.item(0)['email'];
+                $.mobile.changePage("#pagewelcome", {transition: "none"});
+
+                return;
+            }else{
+                $.mobile.changePage("#pageregistration", {transition: "none"});
+            }
+        });
+    }else{
 
         $.mobile.loading( 'hide' );
-
-        if (rs.rows.length){
-
-            user.name = rs.rows.item(0)['name'];
-            user.email = rs.rows.item(0)['email'];
-            $.mobile.changePage("#pagewelcome", {transition: "none"});
-        }
-
-    });
-});
-
-$( document ).on( "pageinit", "#pageprofile", function() {
-
-    $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
-
-        var $ul = $( this ),
-            $input = $( data.input ),
-            value = $input.val(),
-            html = "";
-        $ul.html( "" );
-
-        if ( value && value.length > 2 ) {
-
-            $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
-            $ul.listview( "refresh" );
-            $.ajax({
-                url: connections.webServer + "/breed/search",
-                dataType: "json",
-                type: "POST",
-                data: { text: value },
-                success: function(data){
-
-                },
-                error: function(a, b, c){
-                    alert("Error getting breeds, please check internet connection");
-                }
-            })
-            .then( function ( response ) {
-                    $.each( response, function ( i, val ) {
-                        html += "<li class='.item'><a href='#' >" + val.name + "</a></li>";
-                    });
-                    $ul.html( html );
-                    $ul.listview( "refresh" );
-                    $ul.trigger( "updatelayout");
-
-                    $( "#petbreed li a").on("click", function (){
-                        $input.val($(this).html());
-                        $ul.html( "" );
-                    });
-            });
-        }
-    });
-});
-
-function showRecipes(){
-
-    var $ul = $( "#recipes" );
-    $ul.html( "" );
-    var html = "";
-
-    myDbRecipes.getAll(function(tx, rs){
-
-        for (var i=0; i<rs.rows.length; i++) {
-            var row = rs.rows.item(i);
-            html += "<li ><a href='#' >" + row['name'] + "</a></li>";
-        }
-
-        $ul.html( html );
-        $ul.listview( "refresh" );
-        $ul.trigger( "updatelayout");
-
-    });
-
-    console.log("recipes shown");
+        $.mobile.changePage("#pageregistration", {transition: "none"});
+    }
 }
 
-function applyUpdate(updateName){
+$(document).ready(function(){
 
-    $.mobile.loading( 'show', {
-        text: 'Getting recipes...',
-        textVisible: true,
-        theme: 'a',
-        html: ""
+    initialize();
+
+    $( document ).on( "pageinit", "#pageregistration", function() {
+
+
     });
 
-    //Get Recipes
-    $.ajax({
-        url: connections.webServer + "/recipe/get",
-        dataType: "json",
-        type: "POST",
-        data: { },
-        success: function(data){
+    $( document ).on( "pageinit", "#pageprofile", function() {
 
-        },
-        error: function(a, b, c){
-            $.mobile.loading('hide');
-            showRecipes();
-            alert("Error getting recipes, please check internet connection");
-        }
-    })
-        .then( function ( response ) {
+        $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
 
-            $.mobile.loading('hide');
+            var $ul = $( this ),
+                $input = $( data.input ),
+                value = $input.val(),
+                html = "";
+            $ul.html( "" );
 
-            if (response.length){
+            if ( value && value.length > 2 ) {
 
-                //Delete old recipes
-                myDbRecipes.delete();
-                $.each( response, function ( i, val ) {
-                    myDbRecipes.insert(val.name, val.description);
-                    console.log("inserting recipe " + val.name);
-                });
+                $ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
+                $ul.listview( "refresh" );
+                $.ajax({
+                    url: connections.webServer + "/breed/search",
+                    dataType: "json",
+                    type: "POST",
+                    data: { text: value },
+                    success: function(data){
+
+                    },
+                    error: function(a, b, c){
+                        alert("Error getting breeds, please check internet connection");
+                    }
+                })
+                    .then( function ( response ) {
+                        $.each( response, function ( i, val ) {
+                            html += "<li class='.item'><a href='#' >" + val.name + "</a></li>";
+                        });
+                        $ul.html( html );
+                        $ul.listview( "refresh" );
+                        $ul.trigger( "updatelayout");
+
+                        $( "#petbreed li a").on("click", function (){
+                            $input.val($(this).html());
+                            $ul.html( "" );
+                        });
+                    });
             }
-             //insert update record
-             myDbUpdates.insert(updateName, null);
+        });
+    });
 
-            showRecipes();
+    function showRecipes(){
+
+        var $ul = $( "#recipes" );
+        $ul.html( "" );
+        var html = "";
+
+        myDbRecipes.getAll(function(tx, rs){
+
+            for (var i=0; i<rs.rows.length; i++) {
+                var row = rs.rows.item(i);
+                html += "<li ><a href='#' >" + row['name'] + "</a></li>";
+            }
+
+            $ul.html( html );
+            $ul.listview( "refresh" );
+            $ul.trigger( "updatelayout");
+
         });
 
-}
+        console.log("recipes shown");
+    }
 
-$( document ).on( "pageinit", "#pagewelcome", function() {
+    function applyUpdate(updateName){
 
-    //Show name of user
-    $("#hello #username").html(user.name);
+        $.mobile.loading( 'show', {
+            text: 'Getting new recipes...',
+            textVisible: true,
+            theme: 'a',
+            html: ""
+        });
 
-    $.mobile.loading( 'show', {
-        text: 'Checking for updates...',
-        textVisible: true,
-        theme: 'a',
-        html: ""
-    });
-
-    var numberOfUpdates = 0;
-
-    //Check for local updates
-    myDbUpdates.getAll(function(tx, rs){
-
-        console.log("updates");
-
-        numberOfUpdates = rs.rows.length;
-
-        //Check for online updates
+        //Get Recipes
         $.ajax({
-            url: connections.webServer + "/update/search",
+            url: connections.webServer + "/recipe/get",
             dataType: "json",
             type: "POST",
-            data: { updatesApplied: numberOfUpdates },
+            data: { },
             success: function(data){
 
             },
             error: function(a, b, c){
                 $.mobile.loading('hide');
                 showRecipes();
-                alert("Error getting updates, please check internet connection");
+                alert("Error getting recipes, please check internet connection");
             }
         })
             .then( function ( response ) {
@@ -191,20 +156,96 @@ $( document ).on( "pageinit", "#pagewelcome", function() {
                 $.mobile.loading('hide');
 
                 if (response.length){
+
+                    //Delete old recipes
+                    myDbRecipes.delete();
                     $.each( response, function ( i, val ) {
-                        applyUpdate();
+                        myDbRecipes.insert(val.name, val.description);
+                        console.log("inserting recipe " + val.name);
                     });
-                }else{
-                    showRecipes();
                 }
+                //insert update record
+                myDbUpdates.insert(updateName, null);
+
+                showRecipes();
+            });
+
+    }
+
+    $( document ).on( "pageinit", "#pagewelcome", function() {
+
+        //Show name of user
+        $("#hello #username").html(user.name);
+        showRecipes();
+    });
+
+
+    $( document ).on( "pageshow", "#pagewelcome", function() {
+
+        if(!updatesChecked){
+
+            updatesChecked = true;
+
+            $.mobile.loading( 'show', {
+                text: 'Checking for updates...',
+                textVisible: true,
+                theme: 'a',
+                html: ""
+            });
+
+            var numberOfUpdates = 0;
+
+            //Check for local updates
+            myDbUpdates.getAll(function(tx, rs){
+
+                console.log("updates");
+
+                numberOfUpdates = rs.rows.length;
+
+                //Check for online updates
+                $.ajax({
+                    url: connections.webServer + "/update/search",
+                    dataType: "json",
+                    type: "POST",
+                    data: { updatesApplied: numberOfUpdates },
+                    success: function(data){
+
+                    },
+                    error: function(a, b, c){
+
+                        $.mobile.loading('hide');
+                        $("#popupError").popup('open');
+                        setTimeout($("#popupError").popup('close'), 3000);
+
+                        console.log("error getting updates");
+                    }
+                })
+                    .then( function ( response ) {
+
+                        $.mobile.loading('hide');
+
+                        if (response.length){
+                            $.each( response, function ( i, val ) {
+                                applyUpdate();
+                            });
+                        }
+
+                    });
 
             });
 
+        }
+
     });
 
-});
+    $("#mythcontent").on("swipe",function(){
+        $("#mythtitle").html("Next Myth");
+        $(this).html("My Description");
+    });
 
-$(document).ready(function(){
+    $("#myths li a").on("click", function(){
+        $.mobile.changePage("#pagemyths", {transition: "none"});
+    });
 
     $("#registrationbutton").on("click", function(){
 
@@ -221,7 +262,6 @@ $(document).ready(function(){
         myDbProfile.insert(user.name, user.email);
 
         $.mobile.loading( 'hide' );
-
         $.mobile.changePage("#pagewelcome", {transition: "none"});
 
     });
@@ -237,7 +277,7 @@ function onNotificationGCM(e) {
             if ( e.regid.length > 0 )
             {
                 console.log("Regid " + e.regid);
-                alert('registration id = '+e.regid);
+                //alert('registration id = '+e.regid);
 
                 $("#registrationid").val(e.regid);
             }
@@ -278,7 +318,6 @@ var index_js = function(){
         //aplicacion.escucharEvento(aplicacion.EVENTO_BOTON_MENU, aplicacion.sender.onBotonMenuPresionado);
         //Evento Botón Atrás
         //aplicacion.escucharEvento(aplicacion.EVENTO_BOTON_ATRAS, aplicacion.sender.onBotonAtrasPresionado);
-
 
         //GCM Project 500486635893
         //App Server key AIzaSyAw5zkQI8plPyxOjeY-nw3UUODTQd9Nzv8

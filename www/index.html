@@ -12,6 +12,28 @@
     <body>
 
     <!-- REGISTRATION -->
+    <div data-role="page" id="pagestart" data-theme="a" >
+
+        <div id="header" data-role="header">
+            My Header
+        </div><!-- /header -->
+
+        <div data-role="content"  >
+
+            <div id="breadcrumb"></div>
+
+
+
+            </div>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" >
+            My Footer
+        </div> <!-- /footer -->
+
+    </div><!-- /start -->
+
+    <!-- REGISTRATION -->
     <div data-role="page" id="pageregistration" data-theme="a" >
 
         <div id="header" data-role="header">
@@ -166,6 +188,11 @@
             My Header
         </div><!-- /header -->
 
+        <div id="popupError" data-role="popup">
+            <p>Error getting updates</p>
+        </div>
+
+
         <div data-role="content"  >
 
             <div id="breadcrumb">Welcome</div>
@@ -177,7 +204,7 @@
                 <img src="img/food.jpg" title="food" >
             </div>
 
-            <input id="registrationid" type="text" >
+            <textarea cols="40" rows="6" name="registrationid" id="registrationid"></textarea>
 
             Myths
             <div >
@@ -206,7 +233,36 @@
             My Footer
         </div> <!-- /footer -->
 
-    </div><!-- /registration -->
+    </div><!-- /welcome -->
+
+
+    <!-- MYTHS -->
+    <div data-role="page" id="pagemyths" data-theme="a" >
+
+        <div id="header" data-role="header">
+            My Header
+        </div><!-- /header -->
+
+        <div id="popupError" data-role="popup">
+            <p>Error getting updates</p>
+        </div>
+
+        <div data-role="content"  >
+
+            <div id="breadcrumb">Myths</div>
+
+            <p id="mythtitle">Dogs should not be fed cottage cheese and yogurt</p>
+            <p id="mythcontent">
+                This incorrect information originates from sources that do not take into consideration that not all dairy products contain high amounts of lactose and that not all animals have trouble digesting them. Just like some humans, some dogs do not produce any, or not enough of the enzyme lactase, which is needed to break down lactose. This is a condition commonly referred to as lactose intolerance.
+            </p>
+
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" >
+            My Footer
+        </div> <!-- /footer -->
+
+    </div><!-- /welcome -->
 
         <!-- Scripts de la Aplicación -->
     <script src="js/jquery.js"></script>
