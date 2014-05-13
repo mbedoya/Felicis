@@ -6,11 +6,14 @@ var myDbRecipes = null;
 var myDbProfile = null;
 
 //User
-var user = { name: "", email: "" };
+var user = { name: "", email: "", password:"", pushNotificationId: null };
 
-var connections = { webServer: "http://54.187.2.0" };
+var connections = { webServer: "http://54.187.2.0", gcmProjectId: "500486635893" };
 
 var updatesChecked = false;
+
+var pageDataList = {};
+var pageDataListIndex = 0;
 
 function initialize(){
 
@@ -39,17 +42,19 @@ function initialize(){
 
                 user.name = rs.rows.item(0)['name'];
                 user.email = rs.rows.item(0)['email'];
+                user.pushNotificationId = rs.rows.item(0)['email'];
+
                 $.mobile.changePage("#pagewelcome", {transition: "none"});
 
                 return;
             }else{
-                $.mobile.changePage("#pageregistration", {transition: "none"});
+                $.mobile.changePage("#pagelogin", {transition: "none"});
             }
         });
     }else{
 
         $.mobile.loading( 'hide' );
-        $.mobile.changePage("#pageregistration", {transition: "none"});
+        $.mobile.changePage("#pagelogin", {transition: "none"});
     }
 }
 
@@ -179,6 +184,33 @@ $(document).ready(function(){
         showRecipes();
     });
 
+    $( document ).on( "pageinit", "#pageforbidden", function() {
+
+        pageDataListIndex = 0;
+
+        $("#pageforbidden #opttitle").html(pageDataList[pageDataListIndex].name);
+        $("#pageforbidden #optcontent").html(pageDataList[pageDataListIndex].description);
+
+    });
+
+    $("#pageforbidden #optcontent").on("swiperight",function(){
+
+        pageDataListIndex = 1;
+
+        $("#pageforbidden #opttitle").html(pageDataList[pageDataListIndex].name);
+        $("#pageforbidden #optcontent").html(pageDataList[pageDataListIndex].description);
+
+    });
+
+    $("#pageforbidden #optcontent").on("swipeleft",function(){
+
+        pageDataListIndex = 0;
+
+        $("#pageforbidden #opttitle").html(pageDataList[pageDataListIndex].name);
+        $("#pageforbidden #optcontent").html(pageDataList[pageDataListIndex].description);
+
+    });
+
 
     $( document ).on( "pageshow", "#pagewelcome", function() {
 
@@ -243,14 +275,108 @@ $(document).ready(function(){
         $(this).html("My Description");
     });
 
-    $("#myths li a").on("click", function(){
+    $("#educationlist #forbiddenoption").on("click", function(){
+
+        $.mobile.loading( 'show', {
+            text: 'Getting forbidden food...',
+            textVisible: true,
+            theme: 'a',
+            html: ""
+        });
+
+        $.ajax({
+            url: connections.webServer + "/forbiddenfood/get",
+            dataType: "json",
+            type: "POST",
+            data: {  },
+            success: function(data){
+
+            },
+            error: function(a, b, c){
+
+                $.mobile.loading('hide');
+                alert("Error getting food, please check internet connection");
+            }
+        })
+            .then( function ( response ) {
+
+                $.mobile.loading('hide');
+                pageDataList = response;
+                $.mobile.changePage("#pageforbidden", {transition: "none"});
+
+            });
+
+    });
+
+    $("#educationlist #mythoption").on("click", function(){
         $.mobile.changePage("#pagemyths", {transition: "none"});
+    });
+
+    $("#createaccountbutton").on("click", function(){
+        $.mobile.changePage("#pageregistration", {transition: "none"});
+    });
+
+    $("#pagelogin #loginbutton").on("click", function(){
+
+        $.mobile.loading( 'show', {
+            text: 'Logging in...',
+            textVisible: true,
+            theme: 'a',
+            html: ""
+        });
+
+        user.email = $("#pagelogin #email").val();
+        user.password = $("#pagelogin #password").val();
+
+        //Check email and password
+        $.ajax({
+            url: connections.webServer + "/profile/get",
+            dataType: "json",
+            type: "POST",
+            data: { email: user.email, password: user.password },
+            success: function(data){
+
+            },
+            error: function(a, b, c){
+
+                $.mobile.loading('hide');
+
+                $("#pagelogin #popupError").popup('open');
+                setTimeout($("#pagelogin #popupError").popup('close'), 3000);
+
+                alert("error checking user");
+            }
+        })
+            .then( function ( response ) {
+
+                if(db.dbSupport){
+
+                    if(response.mongoid)
+                    {
+                        user.name = response.name;
+                        myDbProfile.insert(response.name, response.email,response.mongoid);
+                        $.mobile.loading('hide');
+                        $.mobile.changePage("#pagewelcome", {transition: "none"});
+
+                    }else{
+                        $.mobile.loading('hide');
+                        alert("Please check email and password");
+                    }
+
+                }else{
+                    $.mobile.loading('hide');
+                    alert("Your device does not support local storage, you should always login");
+                    $.mobile.changePage("#pagewelcome", {transition: "none"});
+                }
+
+            });
+
     });
 
     $("#registrationbutton").on("click", function(){
 
         $.mobile.loading( 'show', {
-            text: 'Saving...',
+            text: 'Logging in...',
             textVisible: true,
             theme: 'a',
             html: ""
@@ -258,11 +384,61 @@ $(document).ready(function(){
 
         user.name = $("#pageregistration #personname").val();
         user.email = $("#pageregistration #email").val();
+        user.password = $("#pageregistration #password").val();
 
-        myDbProfile.insert(user.name, user.email);
+        var mydata = { name: user.name, email: user.email, password: user.password, pushnotificationid: user.pushNotificationId, pets: [{ name: "coky" }] };
 
-        $.mobile.loading( 'hide' );
-        $.mobile.changePage("#pagewelcome", {transition: "none"});
+        //Check email and password
+        $.ajax({
+            url: connections.webServer + "/profile/post",
+            dataType: "json",
+            type: "POST",
+            data: $.toDictionary(mydata),
+            success: function(data){
+
+            },
+            error: function(a, b, c){
+
+                $.mobile.loading('hide');
+
+                $("#pagelogin #popupError").popup('open');
+                setTimeout($("#pagelogin #popupError").popup('close'), 3000);
+
+                console.log("error registering");
+            }
+        })
+            .then( function ( response ) {
+
+                if (response.errorMessage) {
+
+                    $.mobile.loading('hide');
+                    alert(response.errorMessage);
+
+                } else {
+
+                    if(db.dbSupport){
+
+                        if(response.mongoid)
+                        {
+                            user.name = response.name;
+                            myDbProfile.insert(response.name, response.email,response.mongoid, response.pushnotificationid);
+                            $.mobile.loading('hide');
+                            $.mobile.changePage("#pagewelcome", {transition: "none"});
+
+                        }else{
+                            $.mobile.loading('hide');
+                            alert("Error Registering");
+                        }
+
+                    }else{
+                        $.mobile.loading('hide');
+                        alert("Your device does not support local storage, you should always login");
+                        $.mobile.changePage("#pagewelcome", {transition: "none"});
+                    }
+
+                }
+
+            });
 
     });
 
@@ -277,9 +453,7 @@ function onNotificationGCM(e) {
             if ( e.regid.length > 0 )
             {
                 console.log("Regid " + e.regid);
-                //alert('registration id = '+e.regid);
-
-                $("#registrationid").val(e.regid);
+                user.pushNotificationId = e.regid;
             }
             break;
 
@@ -319,14 +493,15 @@ var index_js = function(){
         //Evento Botón Atrás
         //aplicacion.escucharEvento(aplicacion.EVENTO_BOTON_ATRAS, aplicacion.sender.onBotonAtrasPresionado);
 
-        //GCM Project 500486635893
-        //App Server key AIzaSyAw5zkQI8plPyxOjeY-nw3UUODTQd9Nzv8
-        pushNotification = window.plugins.pushNotification;
-        pushNotification.register(aplicacion.sender.onNotificationSuccess, aplicacion.sender.onNotificationError,{"senderID":"500486635893","ecb":"onNotificationGCM"});
+        if (!user.pushNotificationId){
+
+            pushNotification = window.plugins.pushNotification;
+            pushNotification.register(aplicacion.sender.onNotificationSuccess, aplicacion.sender.onNotificationError,{"senderID":connections.gcmProjectId,"ecb":"onNotificationGCM"});
+        }
     }
 
     this.onNotificationSuccess = function(result) {
-        alert('Callback Success! Result = '+result);
+        console.log('Callback Success! Result = '+result);
     }
 
     this.onNotificationError = function(error) {

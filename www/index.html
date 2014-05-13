@@ -11,7 +11,7 @@
     </head>
     <body>
 
-    <!-- REGISTRATION -->
+    <!-- START -->
     <div data-role="page" id="pagestart" data-theme="a" >
 
         <div id="header" data-role="header">
@@ -58,6 +58,10 @@
                     <label for="email" >your email</label>
                     <input id="email" name="email" type="text" placeholder="email" >
 
+                    <!-- your password -->
+                    <label for="password" >your password</label>
+                    <input id="password" name="password" type="password" placeholder="your password" >
+
                 </div>
 
                 Pet Information
@@ -76,6 +80,54 @@
                 </div>
 
                 <input id="registrationbutton" type="button" value="Save">
+
+            </div>
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" >
+            My Footer
+        </div> <!-- /footer -->
+
+    </div><!-- /registration -->
+
+
+    <!-- LOGIN -->
+    <div data-role="page" id="pagelogin" data-theme="a" >
+
+        <div id="header" data-role="header">
+            My Header
+        </div><!-- /header -->
+
+        <div id="popupError" data-role="popup">
+            <p>Error checking user</p>
+        </div>
+
+        <div data-role="content"  >
+
+            <div id="breadcrumb">Login</div>
+
+            <div class="register_form">
+
+                Account Information
+
+                <div data-role="fieldcontain" class="ui-hide-label">
+
+                    <!-- your name -->
+                    <label for="email" >your email</label>
+                    <input id="email" name="email" type="text" placeholder="your email" >
+
+                    <!-- your password -->
+                    <label for="password" >your password</label>
+                    <input id="password" name="password" type="password" placeholder="your password" >
+
+                </div>
+
+                <input id="loginbutton" type="button" value="Log in">
+
+                <div class="clear"></div>
+
+
+                <input id="createaccountbutton" type="button" value="Create Account">
 
             </div>
         </div><!-- /content -->
@@ -199,32 +251,66 @@
 
             <div id="hello">Hello <span id="username"></span></div>
 
-            <div id="education">
+            <div id="educationaltip">
                 Did you know you can give your lovely dog just this? No dry or can food is necessary.
                 <img src="img/food.jpg" title="food" >
             </div>
 
-            <textarea cols="40" rows="6" name="registrationid" id="registrationid"></textarea>
-
-            Myths
-            <div >
-                <ul id="myths" data-role="listview" data-inset="true">
+            Education
+            <div id="education">
+                <ul id="educationlist" data-role="listview" data-inset="true">
                     <li>
-                        <a href="#">Dogs need balanced dry food</a>
+                        <a href="#" id="forbiddenoption">
+                            <img src="img/forbiddenfood.jpg" />
+                            <h3>Forbidden Food</h3>
+                            <p>Here you can find what can make your dog sick</p>
+                        </a>
                     </li>
                     <li>
-                        <a href="#">Homemade food can be dangerous</a>
+                        <a href="#">
+                            <img src="img/restrictedfood.jpg" />
+                            <h3>Restricted Food</h3>
+                            <p>Here you can find what you can give to your dog being careful  </p>
+                        </a>
                     </li>
                     <li>
-                        <a href="#">Dogs just need meat</a>
+                        <a href="#" id="mythoption">
+                            <img src="img/myth.jpg" />
+                            <h3>Myths</h3>
+                            <p>Here you can get yourself a time to educate about dogs</p>
+                        </a>
                     </li>
                 </ul>
             </div>
 
-            Recipes
-            <div >
-                <ul id="recipes" data-role="listview" data-inset="true"></ul>
+            Nutrition
+            <div id="nutrition">
+                <ul id="nutritionlist" data-role="listview" data-inset="true">
+                    <li>
+                        <a href="#">
+                            <img src="img/recipes.gif" />
+                            <h3>Recipes</h3>
+                            <p>Here you can find most delicious recipes</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <img src="img/dogrecipes.jpg" />
+                            <h3>Cook for you both</h3>
+                            <p>Here you can find how to cook for you and your dog</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <img src="img/fitnessplan.jpg" />
+                            <h3>Set a Fitness Plan</h3>
+                            <p>Here you can find how to make you dog healthy</p>
+                        </a>
+                    </li>
+                </ul>
             </div>
+
+
 
 
         </div><!-- /content -->
@@ -234,6 +320,32 @@
         </div> <!-- /footer -->
 
     </div><!-- /welcome -->
+
+    <!-- FORBIDDEN -->
+    <div data-role="page" id="pageforbidden" data-theme="a" >
+
+        <div id="header" data-role="header">
+            My Header
+        </div><!-- /header -->
+
+        <div id="popupError" data-role="popup">
+            <p>Error getting updates</p>
+        </div>
+
+        <div data-role="content"  >
+
+            <div id="breadcrumb">Forbidden Food</div>
+
+            <p id="opttitle"></p>
+            <p id="optcontent"></p>
+
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed" data-tap-toggle="false" >
+            My Footer
+        </div> <!-- /footer -->
+
+    </div><!-- /forbidden -->
 
 
     <!-- MYTHS -->
@@ -266,6 +378,7 @@
 
         <!-- Scripts de la Aplicación -->
     <script src="js/jquery.js"></script>
+    <script src="js/jdictionay.js"></script>
     <script src="js/jquery.mobile-1.4.2.js"></script>
     <script src="js/communication/ajax.js"></script>
     <script type="text/javascript" src="js/index.js"></script>

@@ -1,5 +1,5 @@
 body{
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .ui-filter-inset {
@@ -22,15 +22,47 @@ body{
     font-weight: bold;
 }
 
-#education{
+#educationaltip{
     font-size: 20px;
     color: #b03911;
 }
 
-#education img{
+#educationaltip img{
     width: 100%;
 }
 
 p#title{
     font-weight: bold;
+}
+input#createaccountbutton {
+     background-color: yellow;
+}
+
+#education{
+
+}
+
+#education img {
+    width: 60px;
+    height: 60px;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+#nutrition img {
+    width: 60px;
+    height: 60px;
+    margin-left: 15px;
+    margin-top: 10px;
+}
+
+.clear{
+    height: 10px;
+    width: 100%;
+    float: left;
+}
+
+#opttitle{
+    font-weight: bold;
+    font-size: 21px;
 }

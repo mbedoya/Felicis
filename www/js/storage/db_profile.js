@@ -7,8 +7,8 @@ var db_profile_js = function(db){
 
     var myDb = db;
 
-    this.insert = function(name, email){
-        myDb.executeCommand("INSERT INTO profile (name,email) VALUES ('"+ name + "','" + email + "');", nullDataHandler, errorHandler);
+    this.insert = function(name, email,mongoid,pushid){
+        myDb.executeCommand("INSERT INTO profile (name,email,mongoid,pushnotificationid) VALUES ('"+ name + "','" + email + "','" + mongoid + "','" + pushid + "');", nullDataHandler, errorHandler);
         console.log("profile inserted");
     }
 
