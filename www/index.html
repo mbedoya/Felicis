@@ -15,7 +15,7 @@
     <div data-role="page" id="pagestart" data-theme="a" >
 
         <div id="header" data-role="header">
-            My Header
+
         </div><!-- /header -->
 
         <div data-role="content"  >
@@ -37,7 +37,7 @@
     <div data-role="page" id="pageregistration" data-theme="a" >
 
         <div id="header" data-role="header">
-            My Header
+
         </div><!-- /header -->
 
         <div data-role="content"  >
@@ -76,6 +76,7 @@
                     <label for="petbreed" >pet breed</label>
                     <ul name="petbreed" id="petbreed" data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="find a breed..." data-filter-theme="a"></ul>
 
+                    <input id="getpicturebutton" type="button" value="Get Picture">
 
                 </div>
 
@@ -95,7 +96,7 @@
     <div data-role="page" id="pagelogin" data-theme="a" >
 
         <div id="header" data-role="header">
-            My Header
+
         </div><!-- /header -->
 
         <div id="popupError" data-role="popup">
@@ -142,7 +143,7 @@
     <div data-role="page" id="pageprofile" data-theme="a" >
 
         <div id="header" data-role="header">
-            My Header
+
         </div><!-- /header -->
 
         <div data-role="content"  >
@@ -236,8 +237,8 @@
     <!-- WELCOME -->
     <div data-role="page" id="pagewelcome" data-theme="a" >
 
-        <div id="header" data-role="header">
-            My Header
+        <div id="header" data-role="header" >
+
         </div><!-- /header -->
 
         <div id="popupError" data-role="popup">
@@ -251,10 +252,10 @@
 
             <div id="hello">Hello <span id="username"></span></div>
 
-            <div id="educationaltip">
+            <!--<div id="educationaltip">
                 Did you know you can give your lovely dog just this? No dry or can food is necessary.
                 <img src="img/food.jpg" title="food" >
-            </div>
+            </div>-->
 
             Education
             <div id="education">
@@ -376,24 +377,55 @@
 
     </div><!-- /welcome -->
 
+
+    <!-- MENU PANEL -->
+
+    <div data-role="panel" id="panelmenu" data-position="left" data-display="overlay">
+        <ul id="menu" >
+            <li><a href="#pagewelcome" data-transition="none">Start</a>
+            <li><a href="#" data-transition="none">Education</a>
+                <ul>
+                    <li><a href="#pageforbidden" data-transition="none">Forbidden Food</a></li>
+                    <li><a href="#pagemyths" data-transition="none">Myths</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- HANDLEBARS TEMPLATES -->
+
+    <script id="header-template" type="text/x-handlebars-template">
+        {{#if showMenu }}
+        <a id="menubtn" href="#panelmenu" class="panel-btn" data-transition="none"><img src="img/mobile-menu.png"></a>
+        {{/if}}
+        <a id="logo" data-transition="none"><img src="img/paw.png"></a><span>Felicis</span>
+        <a id="back" data-rel="back" data-transition="none"></a>
+    </script>
+
         <!-- Scripts de la Aplicación -->
+    <script type="text/javascript" src="js/mobiles/app.js"></script>
     <script src="js/jquery.js"></script>
-    <script src="js/jdictionay.js"></script>
     <script src="js/jquery.mobile-1.4.2.js"></script>
-    <script src="js/communication/ajax.js"></script>
+    <script id="panel-init">
+        $(function() {
+            $( "#panelmenu" ).panel();
+        });
+    </script>
+    <script type="text/javascript" src="PushNotification.js"></script>
+    <script type="text/javascript" src="Camera.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="phonegap.js"></script>
+    <script type="text/javascript">
+        var controller = new index_js();
+        controller.start();
+    </script>
+    <script src="js/jdictionay.js"></script>
     <script type="text/javascript" src="js/storage/database.js"></script>
     <script type="text/javascript" src="js/storage/db_updates.js"></script>
     <script type="text/javascript" src="js/storage/db_recipes.js"></script>
     <script type="text/javascript" src="js/storage/db_profile.js"></script>
     <script src="js/handlebars-v1.3.0.js"></script>
-    <script type="text/javascript" src="phonegap.js"></script>
-    <script type="text/javascript" src="PushNotification.js"></script>
-    <script type="text/javascript" src="js/mobiles/app.js"></script>
-    <script type="text/javascript">
-        var controller = new index_js();
-        controller.start();
-    </script>
+    <script src="js/communication/ajax.js"></script>
 
     </body>
 </html>

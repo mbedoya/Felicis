@@ -21,7 +21,7 @@
         The "device" permission is required for the 'deviceready' event.
     -->
     <feature name="http://api.phonegap.com/1.0/device" />
-
+    <feature name=" http://api.phonegap.com/1.0/camera" />
     <!--
         If you do not want any permissions to be added to your app, add the
         following tag to your config.xml; you will still have the INTERNET
@@ -53,6 +53,7 @@
     -->
 
     <gap:plugin name="com.phonegap.plugins.pushplugin" />
+    <gap:plugin name="org.apache.cordova.camera" />
 
     <!-- Define app icon for each platform. -->
     <icon src="icon.png" />

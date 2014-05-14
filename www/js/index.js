@@ -1,3 +1,5 @@
+//android remote login -u mauricio.bedoya@gmail.com -p mauricio12
+//phonegap local plugin add https://git-wip-us.apache.org/repos/asf/cordova-plugin-camera.git
 
 //Database Object
 var db = null;
@@ -57,6 +59,22 @@ function initialize(){
         $.mobile.changePage("#pagelogin", {transition: "none"});
     }
 }
+
+$('div[data-role=page]').bind('pagecreate', function(event){
+
+    var context = {};
+
+    if($(event.target).attr('id') != "pagelogin"){
+        context = {showMenu: true};
+    }
+
+    //Add Headers to Pages
+    var template = Handlebars.compile($("#header-template").html());
+    var htmlHeader = template(context);
+    $(event.target).find("div[data-role=header]").prepend(htmlHeader);
+    $(event.target).find("div[data-role=header]").attr('class', '');
+
+});
 
 $(document).ready(function(){
 
@@ -314,6 +332,30 @@ $(document).ready(function(){
 
     $("#createaccountbutton").on("click", function(){
         $.mobile.changePage("#pageregistration", {transition: "none"});
+    });
+
+
+    function onCaptureSuccess(fileURI)
+    {
+        alert(fileURI);
+    }
+
+    function onCaptureError(errorMessage){
+        alert(errorMessage);
+    }
+
+    $("#getpicturebutton").on("click", function(){
+
+        try {
+
+            navigator.camera.getPicture(onCaptureSuccess, onCaptureError,
+                { quality : 40, destinationType : Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.PHOTOLIBRARY
+                });
+        }
+        catch(err) {
+
+            alert('Error getting picture: ' + err);
+        }
     });
 
     $("#pagelogin #loginbutton").on("click", function(){
