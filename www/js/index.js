@@ -1,5 +1,8 @@
-//android remote login -u mauricio.bedoya@gmail.com -p mauricio12
+//phonegap remote login -u mauricio.bedoya@gmail.com -p mauricio12
 //phonegap local plugin add https://git-wip-us.apache.org/repos/asf/cordova-plugin-camera.git
+//phonegap local plugin add org.apache.cordova.file
+//phonegap local plugin add org.apache.cordova.file-transfer
+
 
 //Database Object
 var db = null;
@@ -8,7 +11,7 @@ var myDbRecipes = null;
 var myDbProfile = null;
 
 //User
-var user = { name: "", email: "", password:"", pushNotificationId: null };
+var user = { name: "", email: "", password:"", pushNotificationId: null, petimagedata: null, petname: "", petbreed: "", bdId: 0 };
 
 var connections = { webServer: "http://54.187.2.0", gcmProjectId: "500486635893" };
 
@@ -82,11 +85,6 @@ $(document).ready(function(){
 
     $( document ).on( "pageinit", "#pageregistration", function() {
 
-
-    });
-
-    $( document ).on( "pageinit", "#pageprofile", function() {
-
         $( "#petbreed" ).on( "filterablebeforefilter", function ( e, data ) {
 
             var $ul = $( this ),
@@ -112,6 +110,7 @@ $(document).ready(function(){
                     }
                 })
                     .then( function ( response ) {
+
                         $.each( response, function ( i, val ) {
                             html += "<li class='.item'><a href='#' >" + val.name + "</a></li>";
                         });
@@ -334,10 +333,14 @@ $(document).ready(function(){
         $.mobile.changePage("#pageregistration", {transition: "none"});
     });
 
+    function savePicture(){
 
-    function onCaptureSuccess(fileURI)
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
+    }
+
+    function onCaptureSuccess(dataURL)
     {
-        alert(fileURI);
+        user.petimagedata = dataURL;
     }
 
     function onCaptureError(errorMessage){
@@ -349,7 +352,12 @@ $(document).ready(function(){
         try {
 
             navigator.camera.getPicture(onCaptureSuccess, onCaptureError,
-                { quality : 40, destinationType : Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.PHOTOLIBRARY
+                {
+                    quality : 40,
+                    destinationType : Camera.DestinationType.DATA_URL,
+                    sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
+                    encodingType: Camera.EncodingType.PNG,
+                    correctOrientation: true
                 });
         }
         catch(err) {
@@ -397,6 +405,10 @@ $(document).ready(function(){
                     {
                         user.name = response.name;
                         myDbProfile.insert(response.name, response.email,response.mongoid);
+
+                        user.bdId = response.mongoid;
+                        savePicture();
+
                         $.mobile.loading('hide');
                         $.mobile.changePage("#pagewelcome", {transition: "none"});
 
@@ -427,8 +439,11 @@ $(document).ready(function(){
         user.name = $("#pageregistration #personname").val();
         user.email = $("#pageregistration #email").val();
         user.password = $("#pageregistration #password").val();
+        user.petname = $("#pageregistration #petname").val();
+        user.petbreed = $("#pageregistration input[data-type=search]").val();
 
-        var mydata = { name: user.name, email: user.email, password: user.password, pushnotificationid: user.pushNotificationId, pets: [{ name: "coky" }] };
+        var mydata = { name: user.name, email: user.email, password: user.password, pushnotificationid: user.pushNotificationId,
+            pets: [{ name: user.petname, breed: user.petbreed, imagedata: user.petimagedata  }] };
 
         //Check email and password
         $.ajax({
@@ -464,6 +479,10 @@ $(document).ready(function(){
                         {
                             user.name = response.name;
                             myDbProfile.insert(response.name, response.email,response.mongoid, response.pushnotificationid);
+
+                            user.bdId = response.mongoid;
+                            savePicture();
+
                             $.mobile.loading('hide');
                             $.mobile.changePage("#pagewelcome", {transition: "none"});
 
@@ -514,6 +533,51 @@ function onNotificationGCM(e) {
     }
 }
 
+function onFileSystemSuccess(fileSystem) {
+    //fileSystem.root.getFile("readme.txt", {create: true, exclusive: false}, gotFileEntry, fail);
+
+    var directoryEntry = fileSystem.root; // to get root path to directory
+    directoryEntry.getDirectory("Felicis", {create: true, exclusive: false}, onDirectorySuccess, onDirectoryFail);
+    var rootdir = fileSystem.root.toURL();
+    var fp = rootdir + "Felicis/" + user.bdId + ".png";
+    var fileTransfer = new FileTransfer();
+    var uri = encodeURI(connections.webServer +  "/images/" + user.bdId + ".png");
+    fileTransfer.download(
+        uri,
+        fp,
+        function(entry) {
+
+        },
+        function(error) {
+            alert("download error source " + error.source);
+            //alert("download error target " + error.target);
+            //alert("download error code " + error.code);
+        }
+    );
+}
+
+function onDirectorySuccess(parent) {
+    console.log(parent);
+}
+
+function onDirectoryFail(error) {
+    alert("Unable to create new directory: " + error.code);
+}
+
+function gotFileEntry(fileEntry) {
+    fileEntry.createWriter(gotFileWriter, fail);
+}
+
+function gotFileWriter(writer) {
+    //writer.write(user.petimagedata);
+    alert("done");
+}
+
+function fail(evt) {
+    alert(evt.target.error.code);
+}
+
+
 //It gets mobile events
 var index_js = function(){
 
@@ -540,6 +604,7 @@ var index_js = function(){
             pushNotification = window.plugins.pushNotification;
             pushNotification.register(aplicacion.sender.onNotificationSuccess, aplicacion.sender.onNotificationError,{"senderID":connections.gcmProjectId,"ecb":"onNotificationGCM"});
         }
+
     }
 
     this.onNotificationSuccess = function(result) {
